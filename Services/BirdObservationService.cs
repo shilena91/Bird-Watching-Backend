@@ -9,13 +9,23 @@ using Newtonsoft.Json;
 
 namespace bird_watching_backend.Services
 {
-    public class BirdObservationService
+    public interface IBirdObservationService {
+        List<Bird> GetBirds();
+        void readDataFile();
+        Observation AddNewObservationAndLogInfo(int id, ILogger<ObservationsController> _logger);
+        Bird AddNewBirdAndLogInfo(BirdForCreation bird, ILogger<BirdObservationController> _logger);
+    }
+
+    public class BirdObservationService: IBirdObservationService
     {
-        public static BirdObservationService Current { get; } = new BirdObservationService();
+        private string path = "./Data/data.json";
+        
+        private List<Bird> Birds { get; set; } = new List<Bird>();
 
-        string path = "./Data/data.json";
-
-        public List<Bird> Birds { get; set; } = new List<Bird>();
+        public List<Bird> GetBirds()
+        {
+            return Birds;
+        }
 
         public void readDataFile()
         {
@@ -43,7 +53,7 @@ namespace bird_watching_backend.Services
             }
             
             // for only this assignment purpose, to be improved when working with real database
-            var observations = BirdObservationService.Current.Birds.SelectMany(b => b.Observations);
+            var observations = Birds.SelectMany(b => b.Observations);
             var maxObservationId = 0;
 
             if (observations.Count() > 0)

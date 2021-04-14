@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using bird_watching_backend.Models;
 using bird_watching_backend.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -13,17 +12,19 @@ namespace bird_watching_backend.Controllers
     public class BirdObservationController: ControllerBase
     {
         private readonly ILogger<BirdObservationController> _logger;
+        private readonly IBirdObservationService _birdObservationservice;
 
-        public BirdObservationController(ILogger<BirdObservationController> logger)
+        public BirdObservationController(ILogger<BirdObservationController> logger, IBirdObservationService service)
         {
             _logger = logger;
+            _birdObservationservice = service;
         }
 
         [HttpGet]
         public ActionResult<IList<Bird>> GetAllObservations()
         {
-            BirdObservationService.Current.readDataFile();
-            var birds = BirdObservationService.Current.Birds;
+            _birdObservationservice.readDataFile();
+            var birds = _birdObservationservice.GetBirds();
             return Ok(birds);
         }
 
@@ -32,7 +33,7 @@ namespace bird_watching_backend.Controllers
         {
             try
             {
-                var newBird = BirdObservationService.Current.AddNewBirdAndLogInfo(bird, _logger);
+                var newBird = _birdObservationservice.AddNewBirdAndLogInfo(bird, _logger);
                 return Ok(newBird);
             }
             catch(Exception error)

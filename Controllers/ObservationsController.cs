@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using bird_watching_backend.Models;
 using bird_watching_backend.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -13,17 +11,19 @@ namespace bird_watching_backend.Controllers
     public class ObservationsController: ControllerBase
     {
         private readonly ILogger<ObservationsController> _logger;
-        
-        public ObservationsController(ILogger<ObservationsController> logger)
+        private readonly IBirdObservationService _birdObservationservice;
+
+        public ObservationsController(ILogger<ObservationsController> logger, IBirdObservationService service)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _logger = logger;
+            _birdObservationservice = service;
         }
 
         [HttpPost]
         public ActionResult<Observation> CreateNewObservation(int Id)
         {
             try {
-                var newObservation = BirdObservationService.Current.AddNewObservationAndLogInfo(Id, _logger);
+                var newObservation = _birdObservationservice.AddNewObservationAndLogInfo(Id, _logger);
                 return Ok(newObservation);
             }
             catch (Exception ex)
